@@ -1,0 +1,41 @@
+version: '3'
+
+services:
+  gitbucket:
+    image: gitbucket/gitbucket:4.35.3
+    depends_on:
+      - db
+    environment:
+      TZ:  Asia/Tokyo
+      GITBUCKET_HOME: gitbucket
+      GITBUCKET_DB_URL: jdbc:postgresql://db/gitbucket
+      GITBUCKET_DB_USER: gitbucket
+      GITBUCKET_DB_PASSWORD: gitbucket
+      GITBUCKET_BASE_URL: ${GITBUCKET_BASE_URL}
+    ports:
+      - ${GITBUCKET_PORT}:8080
+    volumes:
+      - gitbucket_data:/gitbucket
+    hostname: gitbucket
+    restart: always
+  db:
+    image: postgres:9.6.21-alpine
+    restart: always
+    environment:
+      TZ:  Asia/Tokyo
+      POSTGRES_DB: gitbucket
+      POSTGRES_USER: gitbucket
+      POSTGRES_PASSWORD: gitbucket
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+volumes:
+  gitbucket_data:
+    driver_opts:
+      type: none
+      device: ./volumes/gitbucket_data/
+      o: bind
+  postgres_data:
+    driver_opts:
+      type: none
+      device: ./volumes/postgres_data/
+      o: bind
